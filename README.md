@@ -7,7 +7,32 @@
 [![CD](https://github.com/heavyedge/heavyedge-landmarks/actions/workflows/cd.yml/badge.svg)](https://github.com/heavyedge/heavyedge-landmarks/actions/workflows/cd.yml)
 [![Docs](https://readthedocs.org/projects/heavyedge-landmarks/badge/?version=latest)](https://heavyedge-landmarks.readthedocs.io/en/latest/?badge=latest)
 
+![title](https://heavyedge-landmarks.readthedocs.io/en/latest/_images/plot-header.png)
+
 Python package to locate landmarks from edge profiles.
+
+Supports:
+
+- Pseudo-landmark sampling.
+- Mathematical landmark detection.
+- Plateau fitting.
+
+## Usage
+
+HeavyEdge-Landmarks provides functions to locate landmarks from multiple profiles.
+
+A simple use case to locate 10 pseudo-landmarks:
+
+```python
+from heavyedge import get_sample_path, ProfileData
+from heavyedge_landmarks import pseudo_landmarks
+with ProfileData(get_sample_path("Prep-Type2.h5")) as data:
+    x = data.x()
+    Ys, Ls, _ = data[:]
+lm = pseudo_landmarks(x, Ys, Ls, 10)
+```
+
+Refer to the package documentation for more information.
 
 ## Documentation
 
