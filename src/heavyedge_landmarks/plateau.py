@@ -1,8 +1,11 @@
-"""Detect plateau boundary."""
+"""Detect plateau region from edge profiles."""
 
 import numpy as np
 
-__all__ = []
+__all__ = [
+    "plateau_type2",
+    "plateau_type3",
+]
 
 
 def _ols(Xi, Y):
@@ -85,3 +88,79 @@ def _segreg(x, Y, psi0, tol=1e-5, maxiter=30):
 def _segreg_predict(x, b0, b1, b2, psi):
     x = np.asarray(x)
     return b0 + b1 * x + b2 * (x - psi) * np.heaviside(x - psi, 0)
+
+
+def plateau_type2(x, Ys, peaks, knees):
+    """Find plateau for type 2 heavy edge profiles.
+
+    Parameters
+    ----------
+    x : array of shape (M,)
+        X grid of profiles.
+    Ys : array of shape (N, M)
+        Height data of N profiles.
+    peaks, knees : arrays of shape (N,)
+        X coordinates of peak point and knee point.
+
+    Returns
+    -------
+    array of shape (N, 3)
+        Plateau height, slope and boundary coordinates.
+
+    Notes
+    -----
+    Plateau boundary is located by segmented regression.
+    Plateau slope is forced to be nonnegative.
+
+    See Also
+    --------
+    landmarks_type2 : Detects *peaks* and *knees*.
+    """
+    ret = []
+    for Y, peak, knee in zip(Ys, peaks, knees):
+        peak, knee = np.searchsorted(x, [peak, knee])
+        (b0, b1, _, psi), _ = _segreg(x[:peak], Y[:peak], x[knee])
+        if b1 < 0:
+            psi_idx = knee + np.argmin(np.abs(Y[knee:peak] - b0))
+            b1 = 0.0
+            psi = x[psi_idx]
+        ret.append([b0, b1, psi])
+    return np.array(ret)
+
+
+def plateau_type3(x, Ys, troughs, knees):
+    """Find plateau for type 3 heavy edge profiles.
+
+    Parameters
+    ----------
+    x : array of shape (M,)
+        X grid of profiles.
+    Ys : array of shape (N, M)
+        Height data of N profiles.
+    troughs, knees : arrays of shape (N,)
+        X coordinates of trough point and knee point.
+
+    Returns
+    -------
+    array of shape (N, 3)
+        Plateau height, slope and boundary coordinates.
+
+    Notes
+    -----
+    Plateau boundary is located by segmented regression.
+    Plateau slope is forced to be nonpositive.
+
+    See Also
+    --------
+    landmarks_type3 : Detects *troughs* and *knees*.
+    """
+    ret = []
+    for Y, trough, knee in zip(Ys, troughs, knees):
+        trough, knee = np.searchsorted(x, [trough, knee])
+        (b0, b1, _, psi), _ = _segreg(x[:trough], Y[:trough], x[knee])
+        if b1 > 0:
+            psi_idx = knee + np.argmin(np.abs(Y[knee:trough] - b0))
+            b1 = 0.0
+            psi = x[psi_idx]
+        ret.append([b0, b1, psi])
+    return np.array(ret)
