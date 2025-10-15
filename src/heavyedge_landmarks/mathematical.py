@@ -1,0 +1,1 @@
+"""Locate mathematical landmarks."""
