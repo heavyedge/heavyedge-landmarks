@@ -34,6 +34,12 @@ lm = pseudo_landmarks(x, Ys, Ls, 10)
 
 Refer to the package documentation for more information.
 
+## Installation
+
+```
+$ pip install heavyedge-landmarks
+```
+
 ## Documentation
 
 The manual can be found online:
