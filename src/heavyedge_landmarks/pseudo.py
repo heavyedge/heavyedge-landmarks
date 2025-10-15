@@ -38,6 +38,8 @@ def pseudo_landmarks(x, Ys, Ls, k):
     >>> lm = pseudo_landmarks(x, Ys, Ls, 10)
     >>> lm.shape
     (22, 2, 10)
+    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
+    ... plt.plot(*lm.transpose(1, 2, 0))
     """
     ret = []
     for Y, L in zip(Ys, Ls):

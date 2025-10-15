@@ -15,6 +15,7 @@ def landmarks_type2(x, Ys, Ls, sigma):
 
     Type 2 heavy edge profiles have heavy edge peak.
     The following landmarks are detected:
+
     1. Contact point.
     2. Peak point.
     3. Knee point between plateau and peak.
@@ -45,6 +46,8 @@ def landmarks_type2(x, Ys, Ls, sigma):
     >>> lm = landmarks_type2(x, Ys, Ls, 32)
     >>> lm.shape
     (22, 2, 3)
+    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
+    ... plt.plot(*lm.transpose(1, 2, 0))
     """
     ret = []
     for Y, L in zip(Ys, Ls):
@@ -77,6 +80,7 @@ def landmarks_type3(x, Ys, Ls, sigma):
 
     Type 3 heavy edge profiles have both peak and trough.
     The following landmarks are detected:
+
     1. Contact point.
     2. Peak point.
     3. Trough point.
@@ -108,6 +112,8 @@ def landmarks_type3(x, Ys, Ls, sigma):
     >>> lm = landmarks_type3(x, Ys, Ls, 32)
     >>> lm.shape
     (35, 2, 4)
+    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
+    ... plt.plot(*lm.transpose(1, 2, 0))
     """
     ret = []
     for Y, L in zip(Ys, Ls):
