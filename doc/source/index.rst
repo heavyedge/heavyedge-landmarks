@@ -7,5 +7,8 @@
 HeavyEdge-Landmarks documentation
 *********************************
 
+.. plot:: plot-header.py
+    :include-source: False
+
 .. automodule:: heavyedge_landmarks
     :members:
