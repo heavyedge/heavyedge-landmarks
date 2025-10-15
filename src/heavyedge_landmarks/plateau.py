@@ -124,7 +124,7 @@ def plateau_type2(x, Ys, peaks, knees):
     ...     x = data.x()
     ...     Ys, Ls, _ = data[:]
     >>> lm = landmarks_type2(x, Ys, Ls, 32)
-    >>> peaks, knees = lm.transpose(1, 0, 2)[..., 1:]
+    >>> peaks, knees = lm[:, 0, 1:].T
     >>> plateau_parameters = plateau_type2(x, Ys, peaks, knees)
     >>> plateau_parameters.shape
     (22, 3)
@@ -175,9 +175,10 @@ def plateau_type3(x, Ys, troughs, knees):
     ...     x = data.x()
     ...     Ys, Ls, _ = data[:]
     >>> lm = landmarks_type3(x, Ys, Ls, 32)
-    >>> troughs, knees = lm.transpose(1, 0, 2)[..., 2:]
+    >>> troughs, knees = lm[:, 0, 2:].T
     >>> plateau_parameters = plateau_type3(x, Ys, troughs, knees)
     >>> plateau_parameters.shape
+    (35, 3)
     """
     ret = []
     for Y, trough, knee in zip(Ys, troughs, knees):

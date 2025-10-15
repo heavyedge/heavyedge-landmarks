@@ -107,7 +107,7 @@ def landmarks_type3(x, Ys, Ls, sigma):
     ...     Ys, Ls, _ = data[:]
     >>> lm = landmarks_type3(x, Ys, Ls, 32)
     >>> lm.shape
-    (22, 2, 4)
+    (35, 2, 4)
     """
     ret = []
     for Y, L in zip(Ys, Ls):
