@@ -26,11 +26,8 @@ Acquires configuration matrices of pseudo-landmarks and mathematical landmarks.
 Pre-shape conversion
 ====================
 
-Converts configuration matrices to pre-shapes.
-
-.. autofunction:: preshape
-
-.. autofunction:: dual_preshape
+.. automodule:: heavyedge_landmarks.preshape
+    :members:
 
 Plataeu fitting
 ===============
