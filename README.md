@@ -15,6 +15,7 @@ Supports:
 
 - Pseudo-landmark sampling.
 - Mathematical landmark detection.
+- Converting configuration matrix to pre-shape.
 - Plateau fitting.
 
 ## Usage
