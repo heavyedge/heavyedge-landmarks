@@ -1,4 +1,4 @@
-"""Detect plateau region from edge profiles."""
+"""Finds plateau region by segmented regression."""
 
 import numpy as np
 

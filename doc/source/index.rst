@@ -32,8 +32,5 @@ Pre-shape conversion
 Plataeu fitting
 ===============
 
-Finds plateau region by segmented regression.
-
-.. autofunction:: plateau_type2
-
-.. autofunction:: plateau_type3
+.. automodule:: heavyedge_landmarks.plateau
+    :members:
