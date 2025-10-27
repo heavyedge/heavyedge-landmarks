@@ -117,5 +117,5 @@ def _helmert(k):
 
 @lru_cache(maxsize=CACHE_SIZE)
 def _helmert_hat(k):
-    H = _helmert(k)
+    H = helmert(k)
     return H.T @ np.linalg.inv(H @ H.T)
