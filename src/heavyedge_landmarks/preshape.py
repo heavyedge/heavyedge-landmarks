@@ -11,7 +11,7 @@ import os
 from functools import lru_cache
 
 import numpy as np
-from scipy.linalg import helmert
+from scipy.linalg import cho_factor, cho_solve, helmert
 
 __all__ = [
     "preshape",
@@ -118,4 +118,5 @@ def _helmert(k):
 @lru_cache(maxsize=CACHE_SIZE)
 def _helmert_hat(k):
     H = helmert(k)
-    return H.T @ np.linalg.inv(H @ H.T)
+    # Efficient inversion (H.T @ inv(H @ H.T))
+    return H.T @ cho_solve(cho_factor(H @ H.T), np.eye(H.shape[0]))
