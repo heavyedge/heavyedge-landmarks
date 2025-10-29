@@ -12,6 +12,20 @@ HeavyEdge-Landmarks documentation
 .. plot:: plot-header.py
     :include-source: False
 
+HeavyEdge-Landmarks is a Python package for locating landmarks from coating edge profiles and converting to pre-shapes.
+
+=========
+Tutorials
+=========
+
+=============
+How-to Guides
+=============
+
+==========
+Module API
+==========
+
 Landmark detection
 ==================
 
