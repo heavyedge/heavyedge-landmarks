@@ -30,7 +30,6 @@ classifiers = [
 dependencies = [
     "numpy",
     "scipy",
-    "heavyedge",
 ]
 
 [project.urls]
@@ -41,12 +40,14 @@ documentation = "https://heavyedge-landmarks.readthedocs.io"
 [project.optional-dependencies]
 test = [
     "pytest",
+    "heavyedge",
 ]
 doc = [
     "sphinx",
     "numpydoc",
     "pydata_sphinx_theme",
     "matplotlib",
+    "heavyedge",
 ]
 dev = [
     "flake8",
