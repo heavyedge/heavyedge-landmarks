@@ -84,6 +84,30 @@ Like :func:`landmarks_type2`, you need to specify `sigma`.
     >>> plt.plot(x3, Ys3.T, color="gray", alpha=0.5)
     ... plt.plot(*lm3.transpose(1, 2, 0))
 
+Transforming to pre-shapes
+==========================
+
+A matrix of landmark coordinates from an object is called the *configuration matrix* in statistical shape analysis.
+Configuration matrices can be transformed to the *pre-shape* using :func:`preshape`, where location and size information is removed.
+
+.. plot::
+    :context: close-figs
+
+    >>> from heavyedge_landmarks import preshape
+    >>> ps3 = preshape(lm3)
+    >>> plt.plot(*ps3.transpose(1, 2, 0))
+
+Pre-shapes are in a different space from configuration matrices.
+If you want to represent your pre-shape in the original space, use :func:`dual_preshape`.
+Note that pre-shapes in the original space are rank-deficient.
+
+.. plot::
+    :context: close-figs
+
+    >>> from heavyedge_landmarks import dual_preshape
+    >>> dual_ps3 = dual_preshape(lm3)
+    >>> plt.plot(*dual_ps3.transpose(1, 2, 0))
+
 =============
 How-to Guides
 =============
