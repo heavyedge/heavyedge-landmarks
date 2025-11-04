@@ -76,15 +76,15 @@ How-to Guides
 =============
 
 Determining the sigma value
----------------------------
+===========================
 
 What representation to use
---------------------------
+==========================
 
 Landmarks vs pre-shape vs dual pre-shape
 
 Scaling the data
-----------------
+================
 
 ==========
 Module API
