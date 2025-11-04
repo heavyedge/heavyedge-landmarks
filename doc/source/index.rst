@@ -18,17 +18,17 @@ HeavyEdge-Landmarks is a Python package for locating landmarks from coating edge
 Tutorials
 =========
 
-Detecting landmarks require profile data and length of each profile.
+Detecting landmarks requires profiles and lengths of each profile.
 Here, we use preprocessed data distributed by :mod:`heavyedge` package.
 
 .. plot::
-    :context: reset
+    :context:
 
     >>> from heavyedge import get_sample_path, ProfileData
     >>> with ProfileData(get_sample_path("Prep-Type1.h5")) as data:
     ...     x = data.x()
     ...     Ys, Ls, _ = data[:]
-    >>> import matplotlib.pytest as plt
+    >>> import matplotlib.pyplot as plt
     ... plt.plot(x, Ys.T)
 
 Use :func:`pseudo_landmarks` to locate landmarks by equidistant sampling.
@@ -40,11 +40,10 @@ You need to specify the number of points `k` to sample.
     >>> from heavyedge_landmarks import pseudo_landmarks
     >>> k = 10  # Number of landmarks
     >>> lm = pseudo_landmarks(x, Ys, Ls, k)
-    >>> import matplotlib.pytest as plt
+    >>> import matplotlib.pyplot as plt
     ... plt.plot(*lm.transpose(1, 2, 0))
 
-Use :func:`landmarks_type2` to locate feature points as landmarks, assuming Type 2 edge profile.
-Type 2 profiles have heavy edge peak, but no trough.
+Use :func:`landmarks_type2` to locate feature points as landmarks, assuming Type 2 shape which has heavy edge peak but no trough.
 You need to specify the standad deviation `sigma` of Gaussian kernel for the function to internally smooth noises.
 
 .. plot::
@@ -58,8 +57,7 @@ You need to specify the standad deviation `sigma` of Gaussian kernel for the fun
     >>> lm = landmarks_type2(x, Ys, Ls, sigma)
     >>> plt.plot(*lm.transpose(1, 2, 0))
 
-Use :func:`landmarks_type3` to locate feature points as landmarks, assuming Type 3 edge profile.
-Type 3 profiles have heavy edge peak and trough.
+Use :func:`landmarks_type3` to locate feature points as landmarks, assuming Type 2 shape which has heavy edge peak and trough.
 Like :func:`landmarks_type2`, you need to specify `sigma`.
 
 .. plot::
@@ -77,8 +75,8 @@ Like :func:`landmarks_type2`, you need to specify `sigma`.
 How-to Guides
 =============
 
-Determineing the sigma value
-----------------------------
+Determining the sigma value
+---------------------------
 
 What representation to use
 --------------------------
