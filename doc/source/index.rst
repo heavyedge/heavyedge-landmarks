@@ -41,6 +41,7 @@ You need to specify the number of points `k` to sample.
     >>> k = 10  # Number of landmarks
     >>> lm = pseudo_landmarks(x, Ys, Ls, k)
     >>> import matplotlib.pyplot as plt
+    ... plt.plot(x, Ys.T, color="gray", alpha=0.5)
     ... plt.plot(*lm.transpose(1, 2, 0))
 
 Use :func:`landmarks_type2` to locate feature points as landmarks, assuming Type 2 shape which has heavy edge peak but no trough.
@@ -55,7 +56,8 @@ You need to specify the standad deviation `sigma` of Gaussian kernel for the fun
     ...     Ys, Ls, _ = data[:]
     >>> sigma = 32  # Gaussian kernel std for noise smoothing
     >>> lm = landmarks_type2(x, Ys, Ls, sigma)
-    >>> plt.plot(*lm.transpose(1, 2, 0))
+    >>> plt.plot(x, Ys.T, color="gray", alpha=0.5)
+    ... plt.plot(*lm.transpose(1, 2, 0))
 
 Use :func:`landmarks_type3` to locate feature points as landmarks, assuming Type 2 shape which has heavy edge peak and trough.
 Like :func:`landmarks_type2`, you need to specify `sigma`.
@@ -69,7 +71,8 @@ Like :func:`landmarks_type2`, you need to specify `sigma`.
     ...     Ys, Ls, _ = data[:]
     >>> sigma = 32  # Gaussian kernel std for noise smoothing
     >>> lm = landmarks_type3(x, Ys, Ls, sigma)
-    >>> plt.plot(*lm.transpose(1, 2, 0))
+    >>> plt.plot(x, Ys.T, color="gray", alpha=0.5)
+    ... plt.plot(*lm.transpose(1, 2, 0))
 
 =============
 How-to Guides
