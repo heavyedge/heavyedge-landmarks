@@ -18,6 +18,11 @@ HeavyEdge-Landmarks is a Python package for locating landmarks from coating edge
 Tutorials
 =========
 
+This section provides basic tutorials for beginners.
+
+Preparing data
+==============
+
 Detecting landmarks requires profiles and lengths of each profile.
 Here, we use preprocessed data distributed by :mod:`heavyedge` package.
 
@@ -26,10 +31,21 @@ Here, we use preprocessed data distributed by :mod:`heavyedge` package.
 
     >>> from heavyedge import get_sample_path, ProfileData
     >>> with ProfileData(get_sample_path("Prep-Type1.h5")) as data:
-    ...     x = data.x()
-    ...     Ys, Ls, _ = data[:]
+    ...     x1 = data.x()
+    ...     Ys1, Ls1, _ = data[:]
+    >>> with ProfileData(get_sample_path("Prep-Type2.h5")) as data:
+    ...     x2 = data.x()
+    ...     Ys2, Ls2, _ = data[:]
+    >>> with ProfileData(get_sample_path("Prep-Type3.h5")) as data:
+    ...     x3 = data.x()
+    ...     Ys3, Ls3, _ = data[:]
     >>> import matplotlib.pyplot as plt
-    ... plt.plot(x, Ys.T)
+    ... plt.plot(x1, Ys1.T)
+    ... plt.plot(x2, Ys2.T)
+    ... plt.plot(x3, Ys3.T)
+
+Locating landmarks
+==================
 
 Use :func:`pseudo_landmarks` to locate landmarks by equidistant sampling.
 You need to specify the number of points `k` to sample.
@@ -39,10 +55,10 @@ You need to specify the number of points `k` to sample.
 
     >>> from heavyedge_landmarks import pseudo_landmarks
     >>> k = 10  # Number of landmarks
-    >>> lm = pseudo_landmarks(x, Ys, Ls, k)
+    >>> lm1 = pseudo_landmarks(x1, Ys1, Ls1, k)
     >>> import matplotlib.pyplot as plt
-    ... plt.plot(x, Ys.T, color="gray", alpha=0.5)
-    ... plt.plot(*lm.transpose(1, 2, 0))
+    ... plt.plot(x1, Ys1.T, color="gray", alpha=0.5)
+    ... plt.plot(*lm1.transpose(1, 2, 0))
 
 Use :func:`landmarks_type2` to locate feature points as landmarks, assuming Type 2 shape which has heavy edge peak but no trough.
 You need to specify the standad deviation `sigma` of Gaussian kernel for the function to internally smooth noises.
@@ -51,13 +67,10 @@ You need to specify the standad deviation `sigma` of Gaussian kernel for the fun
     :context: close-figs
 
     >>> from heavyedge_landmarks import landmarks_type2
-    >>> with ProfileData(get_sample_path("Prep-Type2.h5")) as data:
-    ...     x = data.x()
-    ...     Ys, Ls, _ = data[:]
     >>> sigma = 32  # Gaussian kernel std for noise smoothing
-    >>> lm = landmarks_type2(x, Ys, Ls, sigma)
-    >>> plt.plot(x, Ys.T, color="gray", alpha=0.5)
-    ... plt.plot(*lm.transpose(1, 2, 0))
+    >>> lm2 = landmarks_type2(x2, Ys2, Ls2, sigma)
+    >>> plt.plot(x2, Ys2.T, color="gray", alpha=0.5)
+    ... plt.plot(*lm2.transpose(1, 2, 0))
 
 Use :func:`landmarks_type3` to locate feature points as landmarks, assuming Type 2 shape which has heavy edge peak and trough.
 Like :func:`landmarks_type2`, you need to specify `sigma`.
@@ -66,13 +79,10 @@ Like :func:`landmarks_type2`, you need to specify `sigma`.
     :context: close-figs
 
     >>> from heavyedge_landmarks import landmarks_type3
-    >>> with ProfileData(get_sample_path("Prep-Type3.h5")) as data:
-    ...     x = data.x()
-    ...     Ys, Ls, _ = data[:]
     >>> sigma = 32  # Gaussian kernel std for noise smoothing
-    >>> lm = landmarks_type3(x, Ys, Ls, sigma)
-    >>> plt.plot(x, Ys.T, color="gray", alpha=0.5)
-    ... plt.plot(*lm.transpose(1, 2, 0))
+    >>> lm3 = landmarks_type3(x3, Ys3, Ls3, sigma)
+    >>> plt.plot(x3, Ys3.T, color="gray", alpha=0.5)
+    ... plt.plot(*lm3.transpose(1, 2, 0))
 
 =============
 How-to Guides
