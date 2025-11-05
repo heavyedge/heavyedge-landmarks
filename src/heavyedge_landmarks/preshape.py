@@ -17,6 +17,7 @@ from scipy.linalg import cho_factor, cho_solve, helmert
 __all__ = [
     "preshape",
     "dual_preshape",
+    "preshape_dual",
 ]
 
 
@@ -87,17 +88,6 @@ def dual_preshape(Xs):
     -----
     Because location and scale information is lost during the pre-shaping process,
     *Zs* is rank-deficient and has unit norm.
-
-    Examples
-    --------
-    >>> from heavyedge import get_sample_path, ProfileData
-    >>> from heavyedge_landmarks import pseudo_landmarks, dual_preshape
-    >>> with ProfileData(get_sample_path("Prep-Type2.h5")) as data:
-    ...     x = data.x()
-    ...     Ys, Ls, _ = data[:]
-    >>> Zs = dual_preshape(pseudo_landmarks(x, Ys, Ls, 10))
-    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
-    ... plt.plot(*Zs.transpose(1, 2, 0))
     """
     warnings.warn(
         "dual_preshape() is deprecated since HeavyEdge-Landmarks 1.2 "
@@ -111,6 +101,49 @@ def dual_preshape(Xs):
     HX = np.inner(Xs, H)
     scale = np.linalg.norm(HX, axis=(1, 2), keepdims=True)
     Zs = HX / scale
+    hat = _helmert_hat(k)
+    return np.inner(Zs, hat)
+
+
+def preshape_dual(Zs):
+    """Map pre-shape into configuration matrix space.
+
+    Conversion is done using the Helmert sub-matrix and its hat matrix.
+
+    Parameters
+    ----------
+    Zs : array, shape (N, m, k-1)
+        `N` pre-shape matrices.
+
+    Returns
+    -------
+    Zs_dual : array, shape (N, m, k)
+        *Zs* in configuration matrix space.
+
+    See Also
+    --------
+    preshape
+        Pre-shape in its original space.
+
+    Notes
+    -----
+    Because location and scale information is lost during the pre-shaping process,
+    *Zs_dual* is rank-deficient and has unit norm.
+
+    Examples
+    --------
+    >>> from heavyedge import get_sample_path, ProfileData
+    >>> from heavyedge_landmarks import pseudo_landmarks, preshape, preshape_dual
+    >>> with ProfileData(get_sample_path("Prep-Type2.h5")) as data:
+    ...     x = data.x()
+    ...     Ys, Ls, _ = data[:]
+    >>> Zs = preshape(pseudo_landmarks(x, Ys, Ls, 10))
+    >>> Zs_dual = preshape_dual(Zs)
+    >>> import matplotlib.pyplot as plt  # doctest: +SKIP
+    ... plt.plot(*Zs_dual.transpose(1, 2, 0))
+    """
+    _, _, k_minus_one = Zs.shape
+    k = k_minus_one + 1
     hat = _helmert_hat(k)
     return np.inner(Zs, hat)
 

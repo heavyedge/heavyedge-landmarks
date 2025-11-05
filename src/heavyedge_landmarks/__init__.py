@@ -2,7 +2,7 @@
 
 from .mathematical import landmarks_type2, landmarks_type3
 from .plateau import plateau_type2, plateau_type3
-from .preshape import dual_preshape, preshape
+from .preshape import dual_preshape, preshape, preshape_dual
 from .pseudo import pseudo_landmarks
 
 __all__ = [
@@ -11,6 +11,7 @@ __all__ = [
     "landmarks_type3",
     "preshape",
     "dual_preshape",
+    "preshape_dual",
     "plateau_type2",
     "plateau_type3",
 ]
