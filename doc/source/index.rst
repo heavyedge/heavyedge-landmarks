@@ -218,7 +218,7 @@ There are two types of landmarks: **pseudo-landmarks** and **mathematical landma
 - **Pseudo-landmarks** are located by equidistant sampling. Use these when you want to analyze profiles with arbitrary shapes, or to capture the global shape of the coating layer. :func:`pseudo_landmarks` locates pseudo-landmarks.
 - **Mathematical landmarks** are defined by specific mathematical properties. Use these when you need to analyze profiles with known geometric features. :func:`landmarks_type2` and :func:`landmarks_type3` locate mathematical landmarks.
 
-For example, you might want to use CNNs for pseudo-landmarks but DNNs for mathematical landmarks.
+For example, you might want to use pseudo-landmarks for classifying arbitrary profiles using CNNs but mathematical landmarks for modeling shape variation within classes.
 All landmarks can be further transformed to pre-shapes or dual pre-shapes.
 
 Pre-shapes
@@ -288,6 +288,7 @@ Within-sample scaling
 ---------------------
 
 The first step is to scale the aspect ratio of landmarks while preserving the original shape.
+You might skip this step when you are dealing with only y-coordinates as one-dimensional data, but it is essential for two-dimensional data with both x- and y-coordinates.
 The following example shows min-max scaling of landmarks within each sample.
 
 .. plot::
