@@ -23,7 +23,7 @@ This section provides basic tutorials for beginners.
 Preparing data
 ==============
 
-Detecting landmarks requires profiles and lengths of each profile.
+Detecting landmarks requires profiles and their lengths data.
 Here, we use preprocessed data distributed by :mod:`heavyedge` package.
 
 .. plot::
@@ -87,8 +87,8 @@ Like :func:`landmarks_type2`, you need to specify `sigma`.
 Transforming to pre-shapes
 ==========================
 
-A matrix of landmark coordinates from an object is called the *configuration matrix* in statistical shape analysis.
-Configuration matrices can be transformed to the *pre-shape* using :func:`preshape`, where location and size information is removed.
+In statistical shape analysis, a matrix of landmark coordinates from an object is called the *configuration matrix*.
+Configuration matrices can be transformed to the *pre-shapes*, where location and size information is removed, using :func:`preshape`.
 
 .. plot::
     :context: close-figs
@@ -107,6 +107,37 @@ Note that pre-shapes in the original space are rank-deficient.
     >>> from heavyedge_landmarks import dual_preshape
     >>> dual_ps3 = dual_preshape(lm3)
     >>> plt.plot(*dual_ps3.transpose(1, 2, 0))
+
+Fitting the plateau
+===================
+
+Plateaus detected by landmarks can be severely affected by noise or data artifacts.
+For Type 2 profiles, :func:`plateau_type2` can be used for more robust plateau detection by nonlinear regression.
+
+.. plot::
+    :context: close-figs
+
+    >>> from heavyedge_landmarks import plateau_type2
+    >>> peaks, knees = lm2[:, 0, 1:].T
+    >>> y0, m, xlast = plateau_type2(x2, Ys2, peaks, knees).T
+    >>> x = np.stack([np.zeros(len(xlast)), xlast])
+    >>> y = y0 + m * x
+    >>> plt.plot(x2, Ys2.T, color="gray", alpha=0.5)
+    ... plt.plot(x, y)
+
+Likewise, :func:`plateau_type3` can be used for Type 3 profiles.
+
+.. plot::
+    :context: close-figs
+
+    >>> from heavyedge_landmarks import plateau_type3
+    >>> troughs, knees = lm3[:, 0, 2:].T
+    >>> y0, m, xlast = plateau_type3(x3, Ys3, troughs, knees).T
+    >>> x = np.stack([np.zeros(len(xlast)), xlast])
+    >>> y = y0 + m * x
+    >>> plt.plot(x3, Ys3.T, color="gray", alpha=0.5)
+    ... plt.plot(x, y)
+
 
 =============
 How-to Guides
