@@ -67,7 +67,7 @@ def dual_preshape(Xs):
 
     .. deprecated:: 1.2
         This function will be removed in HeavyEdge-Landmarks 2.0,
-        Use :func:`heavyedge_landmarks.preshape_dual` instead.
+        Use :func:`preshape_dual` instead.
 
     Parameters
     ----------
