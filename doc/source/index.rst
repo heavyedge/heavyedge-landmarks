@@ -23,7 +23,7 @@ This section provides basic tutorials for beginners.
 Preparing data
 ==============
 
-Detecting landmarks requires profiles and their lengths data.
+Detecting landmarks requires profile and length data.
 Here, we use preprocessed data distributed by :mod:`heavyedge` package.
 
 .. plot::
@@ -60,8 +60,8 @@ You need to specify the number of points `k` to sample.
     ... plt.plot(x1, Ys1.T, color="gray", alpha=0.5)
     ... plt.plot(*lm1.transpose(1, 2, 0))
 
-Use :func:`landmarks_type2` to locate feature points as landmarks, assuming Type 2 shape which has heavy edge peak but no trough.
-You need to specify the standad deviation `sigma` of Gaussian kernel for the function to internally smooth noises.
+Use :func:`landmarks_type2` to locate feature points as landmarks, assuming Type 2 shape which has a heavy edge peak but no trough.
+You need to specify the standard deviation `sigma` of the Gaussian kernel for the function to internally smooth noise.
 
 .. plot::
     :context: close-figs
@@ -72,7 +72,7 @@ You need to specify the standad deviation `sigma` of Gaussian kernel for the fun
     >>> plt.plot(x2, Ys2.T, color="gray", alpha=0.5)
     ... plt.plot(*lm2.transpose(1, 2, 0))
 
-Use :func:`landmarks_type3` to locate feature points as landmarks, assuming Type 2 shape which has heavy edge peak and trough.
+Use :func:`landmarks_type3` to locate feature points as landmarks, assuming Type 3 shape which has a heavy edge peak and trough.
 Like :func:`landmarks_type2`, you need to specify `sigma`.
 
 .. plot::
@@ -88,7 +88,7 @@ Transforming to pre-shapes
 ==========================
 
 In statistical shape analysis, a matrix of landmark coordinates from an object is called the *configuration matrix*.
-Configuration matrices can be transformed to the *pre-shapes*, where location and size information is removed, using :func:`preshape`.
+Configuration matrices can be transformed to *pre-shapes*, where location and size information is removed, using :func:`preshape`.
 
 .. plot::
     :context: close-figs
@@ -97,7 +97,7 @@ Configuration matrices can be transformed to the *pre-shapes*, where location an
     >>> ps3 = preshape(lm3)
     >>> plt.plot(*ps3.transpose(1, 2, 0))
 
-Pre-shapes are in a different space from configuration matrices.
+Pre-shapes exist in a different space from configuration matrices.
 If you want to represent your pre-shape in the original space, use :func:`dual_preshape`.
 Note that pre-shapes in the original space are rank-deficient.
 
@@ -112,7 +112,7 @@ Fitting the plateau
 ===================
 
 Plateaus detected by landmarks can be severely affected by noise or data artifacts.
-For Type 2 profiles, :func:`plateau_type2` can be used for more robust plateau detection by nonlinear regression.
+For Type 2 profiles, :func:`plateau_type2` can be used for more robust plateau detection through nonlinear regression.
 
 .. plot::
     :context: close-figs
@@ -175,7 +175,7 @@ Pre-shape conversion
 .. automodule:: heavyedge_landmarks.preshape
     :members:
 
-Plataeu fitting
+Plateau fitting
 ===============
 
 .. automodule:: heavyedge_landmarks.plateau
