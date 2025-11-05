@@ -8,6 +8,7 @@
 """
 
 import os
+import warnings
 from functools import lru_cache
 
 import numpy as np
@@ -63,6 +64,10 @@ def dual_preshape(Xs):
 
     Conversion is done using the Helmert sub-matrix and its hat matrix.
 
+    .. deprecated:: 1.2
+        This function will be removed in HeavyEdge-Landmarks 2.0,
+        Use :func:`heavyedge_landmarks.preshape_dual` instead.
+
     Parameters
     ----------
     Xs : array, shape (N, m, k)
@@ -94,6 +99,13 @@ def dual_preshape(Xs):
     >>> import matplotlib.pyplot as plt  # doctest: +SKIP
     ... plt.plot(*Zs.transpose(1, 2, 0))
     """
+    warnings.warn(
+        "dual_preshape() is deprecated since HeavyEdge-Landmarks 1.2 "
+        "and will be removed in 2.0. "
+        "Use preshape_dual() instead.",
+        category=DeprecationWarning,
+        stacklevel=2,
+    )
     _, _, k = Xs.shape
     H = _helmert(k)
     HX = np.inner(Xs, H)
