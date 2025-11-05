@@ -47,6 +47,7 @@ def landmarks_type2(x, Ys, Ls, sigma):
     >>> lm.shape
     (22, 2, 3)
     >>> import matplotlib.pyplot as plt  # doctest: +SKIP
+    ... plt.plot(x, Ys.T, color="gray", alpha=0.5)
     ... plt.plot(*lm.transpose(1, 2, 0))
     """
     ret = []
@@ -113,6 +114,7 @@ def landmarks_type3(x, Ys, Ls, sigma):
     >>> lm.shape
     (35, 2, 4)
     >>> import matplotlib.pyplot as plt  # doctest: +SKIP
+    ... plt.plot(x, Ys.T, color="gray", alpha=0.5)
     ... plt.plot(*lm.transpose(1, 2, 0))
     """
     ret = []
