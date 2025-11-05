@@ -263,6 +263,67 @@ The resulting configuration matrices can be transformed to pre-shapes as usual.
 Scaling the data
 ================
 
+Coating profiles have very high aspect ratio; the following example show how a Type 2 profile actually looks like.
+
+.. plot::
+    :context: reset
+
+    >>> from heavyedge import get_sample_path, ProfileData
+    >>> from heavyedge_landmarks import landmarks_type3
+    >>> with ProfileData(get_sample_path("Prep-Type3.h5")) as data:
+    ...     x3 = data.x()
+    ...     Ys3, Ls3, _ = data[:]
+    >>> lm3 = landmarks_type3(x3, Ys3, Ls3, 32)
+    >>> import matplotlib.pyplot as plt
+    ... plt.plot(x3, Ys3.T, color="gray", alpha=0.5)
+    ... plt.plot(*lm3.transpose(1, 2, 0))
+    ... plt.gca().set_aspect("equal")
+
+Since the x coordinates have much larger scales than the y coordinates, the shape variation along the y-axis becomes negligible if you use two-dimensional data.
+As a result, you might want to scale landmarks before analysis.
+
+Within-sample scaling
+---------------------
+
+The first step is to scale the aspect ratio of landmarks while keeping the original shape.
+The following example shows min-max scaling of landmarks within sample.
+
+.. plot::
+    :context: close-figs
+
+    >>> lm3_scaled = lm3.copy()
+    >>> x, y = lm3_scaled[:, 0, :], lm3_scaled[:, 1, :]
+    >>> xmin, xmax = x.min(axis=1, keepdims=True), x.max(axis=1, keepdims=True)
+    >>> lm3_scaled[:, 0, :] = (lm3_scaled[:, 0, :] - xmin) / (xmax - xmin)
+    >>> ymin, ymax = y.min(axis=1, keepdims=True), y.max(axis=1, keepdims=True)
+    >>> lm3_scaled[:, 1, :] = (lm3_scaled[:, 1, :] - ymin) / (ymax - ymin)
+    >>> plt.plot(*lm3_scaled.transpose(1, 2, 0))
+    ... plt.gca().set_aspect("equal")
+
+Between-sample scaling
+----------------------
+
+If you want to inspect the distribution of landmark positions across samples, you can apply scaling to the entire dataset.
+The following example shows a pipeline which scales a pre-shape, performs PCA and then inverse-transforms the result back to the original space.
+
+.. plot::
+    :context: close-figs
+
+    >>> from heavyedge_landmarks import preshape
+    >>> from sklearn.decomposition import PCA
+    >>> from sklearn.preprocessing import StandardScaler
+    >>> from sklearn.pipeline import Pipeline
+    >>> ps3 = preshape(lm3_scaled)
+    >>> pipeline = Pipeline([
+    ...     ("scaler", StandardScaler()),
+    ...     ("pca", PCA(n_components=1)),
+    ... ])
+    >>> ps3_reduced = pipeline.fit_transform(ps3.reshape(len(ps3), -1))
+    >>> ps3_inv = pipeline.inverse_transform(ps3_reduced).reshape(ps3.shape)
+    >>> fig, axes = plt.subplots(1, 2)
+    ... axes[0].plot(*ps3.transpose(1, 2, 0))
+    ... axes[1].plot(*ps3_inv.transpose(1, 2, 0))
+
 ==========
 Module API
 ==========
