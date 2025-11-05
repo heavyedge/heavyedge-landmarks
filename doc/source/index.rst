@@ -179,7 +179,7 @@ You need to choose the appropriate representation based on your analysis goals.
 Landmarks
 ---------
 
-Landmark coordinates, which construct the configuration matrix, are the primitive representation used for shape analysis.
+**Landmark** coordinates, which construct the configuration matrix, are the primitive representation used for shape analysis.
 They provide a direct mapping of key points on the original edge profiles.
 Use this representation when you need to capture complete information from edge profiles, including shape, scale, and location.
 
@@ -224,14 +224,13 @@ All landmarks can be further transformed to pre-shapes or dual pre-shapes.
 Pre-shapes
 ----------
 
-Pre-shapes are a transformed representation of landmarks that removes location and size information.
-They are useful for analyzing intrinsic shape properties without the influence of external factors.
+**Pre-shape** is a transformed representation of landmarks that removes location and size information.
+It is useful for analyzing intrinsic shape properties without the influence of external factors.
+For most shape analysis, pre-shape is what you want to deal with.
 
-Dual pre-shapes
----------------
-
-Dual pre-shapes are a further transformation of pre-shapes that maps them back to the original space.
-This representation is useful for interpreting the results of shape analysis in the context of the original data.
+**Dual pre-shape** is a further transformation of pre-shape that maps it back to the original space.
+It is introduced to assist visualization of pre-shapes.
+Note that the dual pre-shape matrix is rank-deficient, and might lead to numerical errors if you use it for analysis.
 
 Locating your own landmarks
 ===========================
