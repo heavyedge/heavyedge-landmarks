@@ -5,10 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - UNRELEASED
+
+### Added
+
+- `preshape_dual()` function, which maps pre-shapes to configuration matrix space.
+
+### Deprecated
+
+- `dual_preshape()` function is deprecated. Use `preshape_dual()` function instead.
+
 ## [1.1.0] - 2025-10-28
 
-- `preshape()` function.
-- `dual_preshape()` function.
+### Added
+
+- `preshape()` function, which transforms configuration matrices to pre-shapes.
+- `dual_preshape()` function, which transforms configuration matrices to pre-shapes and then maps to the original space.
 
 ## [1.0.0] - 2025-10-14
 

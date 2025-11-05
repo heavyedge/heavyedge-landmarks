@@ -98,14 +98,14 @@ Configuration matrices can be transformed to *pre-shapes*, where location and si
     >>> plt.plot(*ps3.transpose(1, 2, 0))
 
 Pre-shapes exist in a different space from configuration matrices.
-If you want to represent your pre-shape in the original space, use :func:`dual_preshape`.
+If you want to represent your pre-shape in the original space, use :func:`preshape_dual`.
 Note that pre-shapes in the original space are rank-deficient.
 
 .. plot::
     :context: close-figs
 
-    >>> from heavyedge_landmarks import dual_preshape
-    >>> dual_ps3 = dual_preshape(lm3)
+    >>> from heavyedge_landmarks import preshape_dual
+    >>> dual_ps3 = preshape_dual(ps3)
     >>> plt.plot(*dual_ps3.transpose(1, 2, 0))
 
 Fitting the plateau
@@ -215,22 +215,24 @@ The following example captures pseudo-landmarks from scaled edge profiles to exc
 
 There are two types of landmarks: **pseudo-landmarks** and **mathematical landmarks**.
 
-- **Pseudo-landmarks** are located by equidistant sampling. Use these when you want to analyze profiles with arbitrary shapes, or to capture the global shape of the coating layer.
-- **Mathematical landmarks** are defined by specific mathematical properties. Use these when you need to analyze profiles with known geometric features.
+- **Pseudo-landmarks** are located by equidistant sampling. Use these when you want to analyze profiles with arbitrary shapes, or to capture the global shape of the coating layer. :func:`pseudo_landmarks` locates pseudo-landmarks.
+- **Mathematical landmarks** are defined by specific mathematical properties. Use these when you need to analyze profiles with known geometric features. :func:`landmarks_type2` and :func:`landmarks_type3` locate mathematical landmarks.
 
-For example, you might want to use CNNs for pseudo-landmarks but DNNs for mathematical landmarks.
+For example, you might want to use pseudo-landmarks for classifying arbitrary profiles using CNNs but mathematical landmarks for modeling shape variation within classes.
 All landmarks can be further transformed to pre-shapes or dual pre-shapes.
 
 Pre-shapes
 ----------
 
-**Pre-shape** is a transformed representation of landmarks that removes location and size information.
-It is useful for analyzing intrinsic shape properties without the influence of external factors.
-For most shape analysis, pre-shape is what you want to deal with.
+**Pre-shapes** are a transformed representation of landmarks that removes location and size information.
+They are useful for analyzing intrinsic shape properties without the influence of external factors.
+For most shape analysis, pre-shapes are what you want to work with.
+:func:`preshape` transforms any configuration matrices to pre-shapes.
 
-**Dual pre-shape** is a further transformation of pre-shape that maps it back to the original space.
-It is introduced to assist visualization of pre-shapes.
-Note that the dual pre-shape matrix is rank-deficient, and might lead to numerical errors if you use it for analysis.
+**Dual pre-shapes** are a further transformation of pre-shapes that maps them back to the original space.
+They are introduced to assist with visualization of pre-shapes.
+Note that dual pre-shape matrices are rank-deficient, and might lead to numerical errors if you use them for analysis.
+:func:`preshape_dual` maps any pre-shapes back to the original space.
 
 Locating your own landmarks
 ===========================
@@ -263,7 +265,7 @@ The resulting configuration matrices can be transformed to pre-shapes as usual.
 Scaling the data
 ================
 
-Coating profiles have very high aspect ratio; the following example show how a Type 2 profile actually looks like.
+Coating profiles have very high aspect ratios; the following example shows how a Type 3 profile actually looks.
 
 .. plot::
     :context: reset
@@ -279,14 +281,15 @@ Coating profiles have very high aspect ratio; the following example show how a T
     ... plt.plot(*lm3.transpose(1, 2, 0))
     ... plt.gca().set_aspect("equal")
 
-Since the x coordinates have much larger scales than the y coordinates, the shape variation along the y-axis becomes negligible if you use two-dimensional data.
+Since the x-coordinates have much larger scales than the y-coordinates, the shape variation along the y-axis becomes negligible if you use two-dimensional data.
 As a result, you might want to scale landmarks before analysis.
 
 Within-sample scaling
 ---------------------
 
-The first step is to scale the aspect ratio of landmarks while keeping the original shape.
-The following example shows min-max scaling of landmarks within sample.
+The first step is to scale the aspect ratio of landmarks while preserving the original shape.
+You might skip this step when you are dealing with only y-coordinates as one-dimensional data, but it is essential for two-dimensional data with both x- and y-coordinates.
+The following example shows min-max scaling of landmarks within each sample.
 
 .. plot::
     :context: close-figs
@@ -304,12 +307,12 @@ Between-sample scaling
 ----------------------
 
 If you want to inspect the distribution of landmark positions across samples, you can apply scaling to the entire dataset.
-The following example shows a pipeline which scales a pre-shape, performs PCA and then inverse-transforms the result back to the original space.
+The following example shows a pipeline which scales pre-shapes, performs PCA and then inverse-transforms the result back to the original space.
 
 .. plot::
     :context: close-figs
 
-    >>> from heavyedge_landmarks import preshape
+    >>> from heavyedge_landmarks import preshape, preshape_dual
     >>> from sklearn.decomposition import PCA
     >>> from sklearn.preprocessing import StandardScaler
     >>> from sklearn.pipeline import Pipeline
@@ -319,10 +322,12 @@ The following example shows a pipeline which scales a pre-shape, performs PCA an
     ...     ("pca", PCA(n_components=1)),
     ... ])
     >>> ps3_reduced = pipeline.fit_transform(ps3.reshape(len(ps3), -1))
-    >>> ps3_inv = pipeline.inverse_transform(ps3_reduced).reshape(ps3.shape)
+    >>> lm3_inv = preshape_dual(pipeline.inverse_transform(ps3_reduced).reshape(ps3.shape))
     >>> fig, axes = plt.subplots(1, 2)
-    ... axes[0].plot(*ps3.transpose(1, 2, 0))
-    ... axes[1].plot(*ps3_inv.transpose(1, 2, 0))
+    ... axes[0].plot(*lm3_scaled.transpose(1, 2, 0))
+    ... axes[0].set_title("Original")
+    ... axes[1].plot(*lm3_inv.transpose(1, 2, 0))
+    ... axes[1].set_title("Reconstructed")
 
 ==========
 Module API
