@@ -208,16 +208,16 @@ The following example captures pseudo-landmarks from scaled edge profiles to exc
     ...     x3 = data.x()
     ...     Ys3, Ls3, _ = next(scale_area(data, batch_size=100))
     >>> k = 10  # Number of landmarks
-    >>> lm1 = pseudo_landmarks(x1, Ys1, Ls1, k)
-    >>> lm2 = pseudo_landmarks(x2, Ys2, Ls2, k)
-    >>> lm3 = pseudo_landmarks(x3, Ys3, Ls3, k)
+    >>> pseudo_lm1 = pseudo_landmarks(x1, Ys1, Ls1, k)
+    >>> pseudo_lm2 = pseudo_landmarks(x2, Ys2, Ls2, k)
+    >>> pseudo_lm3 = pseudo_landmarks(x3, Ys3, Ls3, k)
     >>> import matplotlib.pyplot as plt
     ... plt.plot(x1, Ys1.T, color="gray", alpha=0.5)
-    ... plt.plot(*lm1.transpose(1, 2, 0))
+    ... plt.plot(*pseudo_lm1.transpose(1, 2, 0))
     ... plt.plot(x2, Ys2.T, color="gray", alpha=0.5)
-    ... plt.plot(*lm2.transpose(1, 2, 0))
+    ... plt.plot(*pseudo_lm2.transpose(1, 2, 0))
     ... plt.plot(x3, Ys3.T, color="gray", alpha=0.5)
-    ... plt.plot(*lm3.transpose(1, 2, 0))
+    ... plt.plot(*pseudo_lm3.transpose(1, 2, 0))
 
 There are two types of landmarks: **pseudo-landmarks** and **mathematical landmarks**.
 
@@ -349,6 +349,12 @@ Acquires configuration matrices for pseudo-landmarks and mathematical landmarks.
 .. autofunction:: landmarks_type2
 
 .. autofunction:: landmarks_type3
+
+Landmark scaling
+================
+
+.. automodule:: heavyedge_landmarks.scale
+    :members:
 
 Pre-shape conversion
 ====================
