@@ -26,6 +26,7 @@ autodoc_inherit_docstrings = False
 
 intersphinx_mapping = {
     "heavyedge": ("https://heavyedge.readthedocs.io/en/latest/", None),
+    "skpns": ("https://scikit-pns.readthedocs.io/en/latest/", None),
 }
 
 numpydoc_use_plots = True

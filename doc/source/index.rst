@@ -176,8 +176,8 @@ Using this value for landmark detection will likely work well.
     ...     plt.plot(Y_raw)
     ...     plt.axvline(Ls[i])
 
-What representation to use
-==========================
+Which representation to use
+===========================
 
 There are three main representations used in this library: landmarks, pre-shapes, and dual pre-shapes.
 You need to choose the appropriate representation based on your analysis goals.
@@ -268,20 +268,14 @@ The resulting configuration matrices can be transformed to pre-shapes as usual.
     >>> ps3_mod = preshape(lm3_mod)
     >>> plt.plot(*ps3_mod.transpose(1, 2, 0))
 
-Scaling the data
-================
+Scaling landmarks
+=================
 
 Coating profiles have very high aspect ratios; the following example shows how a Type 3 profile actually looks.
 
 .. plot::
-    :context: reset
+    :context: close-figs
 
-    >>> from heavyedge import get_sample_path, ProfileData
-    >>> from heavyedge_landmarks import landmarks_type3
-    >>> with ProfileData(get_sample_path("Prep-Type3.h5")) as data:
-    ...     x3 = data.x()
-    ...     Ys3, Ls3, _ = data[:]
-    >>> lm3 = landmarks_type3(x3, Ys3, Ls3, 32)
     >>> import matplotlib.pyplot as plt
     ... plt.plot(x3, Ys3.T, color="gray", alpha=0.5)
     ... plt.plot(*lm3.transpose(1, 2, 0))
@@ -295,17 +289,13 @@ Within-sample scaling
 
 The first step is to scale the aspect ratio of landmarks while preserving the original shape.
 You might skip this step when you are dealing with only y-coordinates as one-dimensional data, but it is essential for two-dimensional data with both x- and y-coordinates.
-The following example shows min-max scaling of landmarks within each sample.
+The following example shows min-max scaling of landmarks within each sample using :func:`minmax`.
 
 .. plot::
     :context: close-figs
 
-    >>> lm3_scaled = lm3.copy()
-    >>> x, y = lm3_scaled[:, 0, :], lm3_scaled[:, 1, :]
-    >>> xmin, xmax = x.min(axis=1, keepdims=True), x.max(axis=1, keepdims=True)
-    >>> lm3_scaled[:, 0, :] = (lm3_scaled[:, 0, :] - xmin) / (xmax - xmin)
-    >>> ymin, ymax = y.min(axis=1, keepdims=True), y.max(axis=1, keepdims=True)
-    >>> lm3_scaled[:, 1, :] = (lm3_scaled[:, 1, :] - ymin) / (ymax - ymin)
+    >>> from heavyedge_landmarks import minmax
+    >>> lm3_scaled = minmax(lm3)
     >>> plt.plot(*lm3_scaled.transpose(1, 2, 0))
     ... plt.gca().set_aspect("equal")
 
@@ -323,17 +313,55 @@ The following example shows a pipeline which scales pre-shapes, performs PCA and
     >>> from sklearn.preprocessing import StandardScaler
     >>> from sklearn.pipeline import Pipeline
     >>> ps3 = preshape(lm3_scaled)
-    >>> pipeline = Pipeline([
+    >>> n = 1
+    >>> pipeline_pca = Pipeline([
     ...     ("scaler", StandardScaler()),
-    ...     ("pca", PCA(n_components=1)),
+    ...     ("pca", PCA(n_components=n)),
     ... ])
-    >>> ps3_reduced = pipeline.fit_transform(ps3.reshape(len(ps3), -1))
-    >>> lm3_inv = preshape_dual(pipeline.inverse_transform(ps3_reduced).reshape(ps3.shape))
+    >>> ps3_pca = pipeline_pca.fit_transform(ps3.reshape(len(ps3), -1))
+    >>> ps3_pca_inv = preshape_dual(pipeline_pca.inverse_transform(ps3_pca).reshape(ps3.shape))
     >>> fig, axes = plt.subplots(1, 2)
     ... axes[0].plot(*lm3_scaled.transpose(1, 2, 0))
     ... axes[0].set_title("Original")
-    ... axes[1].plot(*lm3_inv.transpose(1, 2, 0))
+    ... axes[1].plot(*ps3_pca_inv.transpose(1, 2, 0))
     ... axes[1].set_title("Reconstructed")
+
+Dimensionality reduction
+========================
+
+Because pre-shape vectors have unit norm, they lie on a high-dimensional sphere.
+If your pre-shapes have high variance, you might want to use Principal Nested Spheres (PNS) analysis technique to preserve its topological structure.
+However, when the variance is small, the result will be marginally different from PCA because the data approximately lies on the tangent space of the hypersphere.
+
+The following example shows the result of pre-shape dimensionality reduction using PNS and PCA.
+The :mod:`skpns` module is used for PNS analysis.
+It can be seen that the PNS preserves the original shapes better than PCA.
+
+.. plot::
+    :context: close-figs
+
+    >>> from skpns import IntrinsicPNS
+    >>> lms = [
+    ...     pseudo_landmarks(x1, Ys1, Ls1, k)[:, [1], :],
+    ...     pseudo_landmarks(x2, Ys2, Ls2, k)[:, [1], :],
+    ...     pseudo_landmarks(x3, Ys3, Ls3, k)[:, [1], :],
+    ... ]
+    >>> scaled_lm = np.concatenate([minmax(lm) for lm in lms], axis=0)
+    >>> ps = preshape(scaled_lm)
+    >>> pipeline_pns = Pipeline([("pns", IntrinsicPNS(n))])
+    >>> pca = pipeline_pca.fit_transform(ps.reshape(len(ps), -1))
+    >>> pca_inv = preshape_dual(pipeline_pca.inverse_transform(pca).reshape(ps.shape))
+    >>> pns = pipeline_pns.fit_transform(ps.reshape(len(ps), -1))
+    >>> pns_inv = preshape_dual(pipeline_pns.inverse_transform(pns).reshape(ps.shape))
+    >>> fig, axes = plt.subplots(1, 3)
+    ... axes[0].plot(*preshape_dual(ps).transpose(1, 2, 0))
+    ... axes[0].set_title("Original")
+    ... axes[1].plot(*pns_inv.transpose(1, 2, 0))
+    ... axes[1].set_title("PNS")
+    ... axes[2].plot(*pca_inv.transpose(1, 2, 0))
+    ... axes[2].set_title("PCA")
+    ... for ax in axes.flat:
+    ...     ax.set_axis_off()
 
 ==========
 Module API

@@ -49,6 +49,7 @@ doc = [
     "matplotlib",
     "heavyedge",
     "scikit-learn",
+    "scikit-pns>=1.2.0",
 ]
 dev = [
     "flake8",
