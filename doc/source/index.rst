@@ -335,6 +335,7 @@ However, when the variance is small, the result will be marginally different fro
 
 The following example shows the result of pre-shape dimensionality reduction using PNS and PCA.
 The :mod:`skpns` module is used for PNS analysis.
+Note that the landmarks are not scaled in this example because they are one-dimensional, and that PNS does not require standardization.
 It can be seen that the PNS preserves the original shapes better than PCA.
 
 .. plot::
@@ -346,7 +347,7 @@ It can be seen that the PNS preserves the original shapes better than PCA.
     ...     pseudo_landmarks(x2, Ys2, Ls2, k)[:, [1], :],
     ...     pseudo_landmarks(x3, Ys3, Ls3, k)[:, [1], :],
     ... ]
-    >>> scaled_lm = np.concatenate([minmax(lm) for lm in lms], axis=0)
+    >>> scaled_lm = np.concatenate(lms, axis=0)
     >>> ps = preshape(scaled_lm)
     >>> pipeline_pns = Pipeline([("pns", IntrinsicPNS(n))])
     >>> pca = pipeline_pca.fit_transform(ps.reshape(len(ps), -1))
