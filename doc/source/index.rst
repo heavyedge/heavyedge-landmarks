@@ -163,7 +163,7 @@ The code below shows that `sigma=32` properly detects contact points for all pro
 Using this value for landmark detection will likely work well.
 
 .. plot::
-    :context: close-figs
+    :context: reset
 
     >>> from heavyedge import get_sample_path, RawProfileCsvs
     >>> from heavyedge.api import prep
@@ -193,9 +193,9 @@ Of course, you can preprocess the data to exclude certain information.
 The following example captures pseudo-landmarks from scaled edge profiles to exclude the size variation of coating layers.
 
 .. plot::
-    :context: reset
+    :context: close-figs
 
-    >>> from heavyedge import get_sample_path, ProfileData
+    >>> from heavyedge import ProfileData
     >>> from heavyedge.api import scale_area
     >>> from heavyedge_landmarks import pseudo_landmarks
     >>> with ProfileData(get_sample_path("Prep-Type1.h5")) as data:
@@ -287,7 +287,7 @@ As a result, you might want to scale landmarks before analysis.
 Within-sample scaling
 ---------------------
 
-The first step is to scale the aspect ratio of landmarks while preserving the original shape.
+The most straightforward approach is to scale the aspect ratio of landmarks while preserving the original shape.
 You might skip this step when you are dealing with only y-coordinates as one-dimensional data, but it is essential for two-dimensional data with both x- and y-coordinates.
 The following example shows min-max scaling of landmarks within each sample using :func:`minmax`.
 
@@ -303,28 +303,30 @@ Between-sample scaling
 ----------------------
 
 If you want to inspect the distribution of landmark positions across samples, you can apply scaling to the entire dataset.
-The following example shows a pipeline which scales pre-shapes, performs PCA and then inverse-transforms the result back to the original space.
+The following example shows a pipeline which standardizes landmarks, performs PCA and then inverse-transforms the result back to the original space.
 
 .. plot::
     :context: close-figs
 
-    >>> from heavyedge_landmarks import preshape, preshape_dual
     >>> from sklearn.decomposition import PCA
     >>> from sklearn.preprocessing import StandardScaler
     >>> from sklearn.pipeline import Pipeline
-    >>> ps3 = preshape(lm3_scaled)
     >>> n = 1
     >>> pipeline_pca = Pipeline([
     ...     ("scaler", StandardScaler()),
     ...     ("pca", PCA(n_components=n)),
     ... ])
-    >>> ps3_pca = pipeline_pca.fit_transform(ps3.reshape(len(ps3), -1))
-    >>> ps3_pca_inv = preshape_dual(pipeline_pca.inverse_transform(ps3_pca).reshape(ps3.shape))
+    >>> lm3_pca = pipeline_pca.fit_transform(lm3.reshape(len(lm3), -1))
+    >>> lm3_pca_inv = pipeline_pca.inverse_transform(lm3_pca).reshape(lm3.shape)
     >>> fig, axes = plt.subplots(1, 2)
     ... axes[0].plot(*lm3_scaled.transpose(1, 2, 0))
     ... axes[0].set_title("Original")
-    ... axes[1].plot(*ps3_pca_inv.transpose(1, 2, 0))
+    ... axes[1].plot(*lm3_pca_inv.transpose(1, 2, 0))
     ... axes[1].set_title("Reconstructed")
+
+.. note::
+
+    You can apply standard scaling to within-sample-scaled landmarks
 
 Dimensionality reduction
 ========================
@@ -341,6 +343,8 @@ It can be seen that the PNS preserves the original shapes better than PCA.
 .. plot::
     :context: close-figs
 
+    >>> from heavyedge_landmarks import preshape, preshape_dual
+    >>> from sklearn.decomposition import PCA
     >>> from skpns import IntrinsicPNS
     >>> lms = [
     ...     pseudo_landmarks(x1, Ys1, Ls1, k)[:, [1], :],
@@ -349,11 +353,12 @@ It can be seen that the PNS preserves the original shapes better than PCA.
     ... ]
     >>> scaled_lm = np.concatenate(lms, axis=0)
     >>> ps = preshape(scaled_lm)
-    >>> pipeline_pns = Pipeline([("pns", IntrinsicPNS(n))])
-    >>> pca = pipeline_pca.fit_transform(ps.reshape(len(ps), -1))
-    >>> pca_inv = preshape_dual(pipeline_pca.inverse_transform(pca).reshape(ps.shape))
-    >>> pns = pipeline_pns.fit_transform(ps.reshape(len(ps), -1))
-    >>> pns_inv = preshape_dual(pipeline_pns.inverse_transform(pns).reshape(ps.shape))
+    >>> pns = IntrinsicPNS(n)
+    >>> pns_result = pns.fit_transform(ps.reshape(len(ps), -1))
+    >>> pns_inv = preshape_dual(pns.inverse_transform(pns_result).reshape(ps.shape))
+    >>> pca = PCA(n)
+    >>> pca_result = pca.fit_transform(ps.reshape(len(ps), -1))
+    >>> pca_inv = preshape_dual(pca.inverse_transform(pca_result).reshape(ps.shape))
     >>> fig, axes = plt.subplots(1, 3)
     ... axes[0].plot(*preshape_dual(ps).transpose(1, 2, 0))
     ... axes[0].set_title("Original")
