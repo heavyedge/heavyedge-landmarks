@@ -67,7 +67,7 @@ You need to specify the number of points `k` to sample.
     ... plt.plot(*lm1.transpose(1, 2, 0))
 
 Use :func:`landmarks_type2` to locate feature points as landmarks, assuming a Type 2 shape which has a heavy edge peak but no trough.
-You need to specify the standard deviation `sigma` of the Gaussian kernel for the function to internally smooth noise.
+You need to specify the standard deviation `sigma` of the Gaussian kernel for the function to smooth noise internally.
 
 .. plot::
     :context: close-figs
@@ -232,11 +232,11 @@ Pre-shapes
 
 **Pre-shapes** are a transformed representation of landmarks that removes location and size information.
 They are useful for analyzing intrinsic shape properties without the influence of external factors.
-For most shape analysis, pre-shapes are what you want to work with.
+For most shape analyses, pre-shapes are what you want to work with.
 :func:`preshape` transforms any configuration matrices to pre-shapes.
 
 **Dual pre-shapes** are a further transformation of pre-shapes that maps them back to the original space.
-They are introduced to assist with visualization of pre-shapes.
+They are introduced to assist with the visualization of pre-shapes.
 Note that dual pre-shape matrices are rank-deficient, and might lead to numerical errors if you use them for analysis.
 :func:`preshape_dual` maps any pre-shapes back to the original space.
 
@@ -271,16 +271,7 @@ The resulting configuration matrices can be transformed to pre-shapes as usual.
 Scaling landmarks
 =================
 
-Coating profiles have very high aspect ratios; the following example shows how a Type 3 profile actually looks.
-
-.. plot::
-    :context: close-figs
-
-    >>> import matplotlib.pyplot as plt
-    ... plt.plot(x3, Ys3.T, color="gray", alpha=0.5)
-    ... plt.plot(*lm3.transpose(1, 2, 0))
-    ... plt.gca().set_aspect("equal")
-
+Coating profiles have very high aspect ratios.
 Since the x-coordinates have much larger scales than the y-coordinates, the shape variation along the y-axis becomes negligible if you use two-dimensional data.
 As a result, you might want to scale landmarks before analysis.
 
@@ -324,21 +315,18 @@ The following example shows a pipeline which standardizes landmarks, performs PC
     ... axes[1].plot(*lm3_pca_inv.transpose(1, 2, 0))
     ... axes[1].set_title("Reconstructed")
 
-.. note::
-
-    You can apply standard scaling to within-sample-scaled landmarks
-
 Dimensionality reduction
 ========================
 
+In the previous example, the dimensionality of the configuration vector was reduced by standardization and subsequent PCA.
+Sometimes, you instead want to perform dimensionality reduction for pre-shapes.
 Because pre-shape vectors have unit norm, they lie on a high-dimensional sphere.
-If your pre-shapes have high variance, you might want to use Principal Nested Spheres (PNS) analysis technique to preserve its topological structure.
-However, when the variance is small, the result will be marginally different from PCA because the data approximately lies on the tangent space of the hypersphere.
+To preserve this structure, you need to use Principal Nested Spheres (PNS) analysis instead of PCA.
 
 The following example shows the result of pre-shape dimensionality reduction using PNS and PCA.
 The :mod:`skpns` module is used for PNS analysis.
-Note that the landmarks are not scaled in this example because they are one-dimensional, and that PNS does not require standardization.
-It can be seen that the PNS preserves the original shapes better than PCA.
+It can be seen that PNS preserves the original shapes better than PCA.
+Also, note that pre-shapes are not standardized before dimensionality reduction because doing so will destroy the hypersphere structure.
 
 .. plot::
     :context: close-figs
@@ -368,6 +356,10 @@ It can be seen that the PNS preserves the original shapes better than PCA.
     ... axes[2].set_title("PCA")
     ... for ax in axes.flat:
     ...     ax.set_axis_off()
+
+.. note::
+
+    When pre-shapes have small variance, the PNS result will be only marginally different from PCA because the data approximately lies on the tangent space of the hypersphere, which is linear.
 
 ==========
 Module API
