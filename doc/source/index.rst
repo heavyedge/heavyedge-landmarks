@@ -67,7 +67,7 @@ You need to specify the number of points `k` to sample.
     ... plt.plot(*lm1.transpose(1, 2, 0))
 
 Use :func:`landmarks_type2` to locate feature points as landmarks, assuming a Type 2 shape which has a heavy edge peak but no trough.
-You need to specify the standard deviation `sigma` of the Gaussian kernel for the function to internally smooth noise.
+You need to specify the standard deviation `sigma` of the Gaussian kernel for the function to smooth noise internally.
 
 .. plot::
     :context: close-figs
@@ -163,7 +163,7 @@ The code below shows that `sigma=32` properly detects contact points for all pro
 Using this value for landmark detection will likely work well.
 
 .. plot::
-    :context: close-figs
+    :context: reset
 
     >>> from heavyedge import get_sample_path, RawProfileCsvs
     >>> from heavyedge.api import prep
@@ -193,9 +193,9 @@ Of course, you can preprocess the data to exclude certain information.
 The following example captures pseudo-landmarks from scaled edge profiles to exclude the size variation of coating layers.
 
 .. plot::
-    :context: reset
+    :context: close-figs
 
-    >>> from heavyedge import get_sample_path, ProfileData
+    >>> from heavyedge import ProfileData
     >>> from heavyedge.api import scale_area
     >>> from heavyedge_landmarks import pseudo_landmarks
     >>> with ProfileData(get_sample_path("Prep-Type1.h5")) as data:
@@ -232,11 +232,11 @@ Pre-shapes
 
 **Pre-shapes** are a transformed representation of landmarks that removes location and size information.
 They are useful for analyzing intrinsic shape properties without the influence of external factors.
-For most shape analysis, pre-shapes are what you want to work with.
+For most shape analyses, pre-shapes are what you want to work with.
 :func:`preshape` transforms any configuration matrices to pre-shapes.
 
 **Dual pre-shapes** are a further transformation of pre-shapes that maps them back to the original space.
-They are introduced to assist with visualization of pre-shapes.
+They are introduced to assist with the visualization of pre-shapes.
 Note that dual pre-shape matrices are rank-deficient, and might lead to numerical errors if you use them for analysis.
 :func:`preshape_dual` maps any pre-shapes back to the original space.
 
@@ -271,23 +271,14 @@ The resulting configuration matrices can be transformed to pre-shapes as usual.
 Scaling landmarks
 =================
 
-Coating profiles have very high aspect ratios; the following example shows how a Type 3 profile actually looks.
-
-.. plot::
-    :context: close-figs
-
-    >>> import matplotlib.pyplot as plt
-    ... plt.plot(x3, Ys3.T, color="gray", alpha=0.5)
-    ... plt.plot(*lm3.transpose(1, 2, 0))
-    ... plt.gca().set_aspect("equal")
-
+Coating profiles have very high aspect ratios.
 Since the x-coordinates have much larger scales than the y-coordinates, the shape variation along the y-axis becomes negligible if you use two-dimensional data.
 As a result, you might want to scale landmarks before analysis.
 
 Within-sample scaling
 ---------------------
 
-The first step is to scale the aspect ratio of landmarks while preserving the original shape.
+The most straightforward approach is to scale the aspect ratio of landmarks while preserving the original shape.
 You might skip this step when you are dealing with only y-coordinates as one-dimensional data, but it is essential for two-dimensional data with both x- and y-coordinates.
 The following example shows min-max scaling of landmarks within each sample using :func:`minmax`.
 
@@ -303,44 +294,45 @@ Between-sample scaling
 ----------------------
 
 If you want to inspect the distribution of landmark positions across samples, you can apply scaling to the entire dataset.
-The following example shows a pipeline which scales pre-shapes, performs PCA and then inverse-transforms the result back to the original space.
+The following example shows a pipeline which standardizes landmarks, performs PCA and then inverse-transforms the result back to the original space.
+
+.. plot::
+    :context: close-figs
+
+    >>> from sklearn.decomposition import PCA
+    >>> from sklearn.preprocessing import StandardScaler
+    >>> from sklearn.pipeline import Pipeline
+    >>> n = 1
+    >>> pipeline_pca = Pipeline([
+    ...     ("scaler", StandardScaler()),
+    ...     ("pca", PCA(n_components=n)),
+    ... ])
+    >>> lm3_pca = pipeline_pca.fit_transform(lm3.reshape(len(lm3), -1))
+    >>> lm3_pca_inv = pipeline_pca.inverse_transform(lm3_pca).reshape(lm3.shape)
+    >>> fig, axes = plt.subplots(1, 2)
+    ... axes[0].plot(*lm3_scaled.transpose(1, 2, 0))
+    ... axes[0].set_title("Original")
+    ... axes[1].plot(*lm3_pca_inv.transpose(1, 2, 0))
+    ... axes[1].set_title("Reconstructed")
+
+Dimensionality reduction
+========================
+
+In the previous example, the dimensionality of the configuration vector was reduced by standardization and subsequent PCA.
+Sometimes, you instead want to perform dimensionality reduction for pre-shapes.
+Because pre-shape vectors have unit norm, they lie on a high-dimensional sphere.
+To preserve this structure, you need to use Principal Nested Spheres (PNS) analysis instead of PCA.
+
+The following example shows the result of pre-shape dimensionality reduction using PNS and PCA.
+The :mod:`skpns` module is used for PNS analysis.
+It can be seen that PNS preserves the original shapes better than PCA.
+Also, note that pre-shapes are not standardized before dimensionality reduction because doing so will destroy the hypersphere structure.
 
 .. plot::
     :context: close-figs
 
     >>> from heavyedge_landmarks import preshape, preshape_dual
     >>> from sklearn.decomposition import PCA
-    >>> from sklearn.preprocessing import StandardScaler
-    >>> from sklearn.pipeline import Pipeline
-    >>> ps3 = preshape(lm3_scaled)
-    >>> n = 1
-    >>> pipeline_pca = Pipeline([
-    ...     ("scaler", StandardScaler()),
-    ...     ("pca", PCA(n_components=n)),
-    ... ])
-    >>> ps3_pca = pipeline_pca.fit_transform(ps3.reshape(len(ps3), -1))
-    >>> ps3_pca_inv = preshape_dual(pipeline_pca.inverse_transform(ps3_pca).reshape(ps3.shape))
-    >>> fig, axes = plt.subplots(1, 2)
-    ... axes[0].plot(*lm3_scaled.transpose(1, 2, 0))
-    ... axes[0].set_title("Original")
-    ... axes[1].plot(*ps3_pca_inv.transpose(1, 2, 0))
-    ... axes[1].set_title("Reconstructed")
-
-Dimensionality reduction
-========================
-
-Because pre-shape vectors have unit norm, they lie on a high-dimensional sphere.
-If your pre-shapes have high variance, you might want to use Principal Nested Spheres (PNS) analysis technique to preserve its topological structure.
-However, when the variance is small, the result will be marginally different from PCA because the data approximately lies on the tangent space of the hypersphere.
-
-The following example shows the result of pre-shape dimensionality reduction using PNS and PCA.
-The :mod:`skpns` module is used for PNS analysis.
-Note that the landmarks are not scaled in this example because they are one-dimensional, and that PNS does not require standardization.
-It can be seen that the PNS preserves the original shapes better than PCA.
-
-.. plot::
-    :context: close-figs
-
     >>> from skpns import IntrinsicPNS
     >>> lms = [
     ...     pseudo_landmarks(x1, Ys1, Ls1, k)[:, [1], :],
@@ -349,11 +341,12 @@ It can be seen that the PNS preserves the original shapes better than PCA.
     ... ]
     >>> scaled_lm = np.concatenate(lms, axis=0)
     >>> ps = preshape(scaled_lm)
-    >>> pipeline_pns = Pipeline([("pns", IntrinsicPNS(n))])
-    >>> pca = pipeline_pca.fit_transform(ps.reshape(len(ps), -1))
-    >>> pca_inv = preshape_dual(pipeline_pca.inverse_transform(pca).reshape(ps.shape))
-    >>> pns = pipeline_pns.fit_transform(ps.reshape(len(ps), -1))
-    >>> pns_inv = preshape_dual(pipeline_pns.inverse_transform(pns).reshape(ps.shape))
+    >>> pns = IntrinsicPNS(n)
+    >>> pns_result = pns.fit_transform(ps.reshape(len(ps), -1))
+    >>> pns_inv = preshape_dual(pns.inverse_transform(pns_result).reshape(ps.shape))
+    >>> pca = PCA(n)
+    >>> pca_result = pca.fit_transform(ps.reshape(len(ps), -1))
+    >>> pca_inv = preshape_dual(pca.inverse_transform(pca_result).reshape(ps.shape))
     >>> fig, axes = plt.subplots(1, 3)
     ... axes[0].plot(*preshape_dual(ps).transpose(1, 2, 0))
     ... axes[0].set_title("Original")
@@ -363,6 +356,10 @@ It can be seen that the PNS preserves the original shapes better than PCA.
     ... axes[2].set_title("PCA")
     ... for ax in axes.flat:
     ...     ax.set_axis_off()
+
+.. note::
+
+    When pre-shapes have small variance, the PNS result will be only marginally different from PCA because the data approximately lies on the tangent space of the hypersphere, which is linear.
 
 ==========
 Module API
