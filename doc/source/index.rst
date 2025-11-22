@@ -372,6 +372,8 @@ Acquires configuration matrices for pseudo-landmarks and mathematical landmarks.
 
 .. autofunction:: pseudo_landmarks
 
+.. autofunction:: landmarks_type1
+
 .. autofunction:: landmarks_type2
 
 .. autofunction:: landmarks_type3
