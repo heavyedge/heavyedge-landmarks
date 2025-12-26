@@ -110,7 +110,6 @@ def plateau_type2(x, Ys, peaks, knees):
     Notes
     -----
     Plateau boundary is located by segmented regression.
-    Plateau slope is forced to be nonnegative.
 
     See Also
     --------
@@ -138,10 +137,6 @@ def plateau_type2(x, Ys, peaks, knees):
     for Y, peak, knee in zip(Ys, peaks, knees):
         peak, knee = np.searchsorted(x, [peak, knee])
         (b0, b1, _, psi), _ = _segreg(x[:peak], Y[:peak], x[knee])
-        if b1 < 0:
-            psi_idx = knee + np.argmin(np.abs(Y[knee:peak] - b0))
-            b1 = 0.0
-            psi = x[psi_idx]
         ret.append([b0, b1, psi])
     return np.array(ret)
 
@@ -166,7 +161,6 @@ def plateau_type3(x, Ys, troughs, knees):
     Notes
     -----
     Plateau boundary is located by segmented regression.
-    Plateau slope is forced to be nonpositive.
 
     See Also
     --------
@@ -194,9 +188,5 @@ def plateau_type3(x, Ys, troughs, knees):
     for Y, trough, knee in zip(Ys, troughs, knees):
         trough, knee = np.searchsorted(x, [trough, knee])
         (b0, b1, _, psi), _ = _segreg(x[:trough], Y[:trough], x[knee])
-        if b1 > 0:
-            psi_idx = knee + np.argmin(np.abs(Y[knee:trough] - b0))
-            b1 = 0.0
-            psi = x[psi_idx]
         ret.append([b0, b1, psi])
     return np.array(ret)
