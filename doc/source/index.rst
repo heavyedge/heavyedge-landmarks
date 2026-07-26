@@ -14,6 +14,11 @@ HeavyEdge-Landmarks documentation
 
 HeavyEdge-Landmarks is a Python package for locating landmarks from coating edge profiles and converting them to pre-shapes.
 
+.. warning::
+
+    This project is no longer maintained as a standalone package.
+    Use `heavyedge-features <https://pypi.org/project/heavyedge-features/>`_ instead.
+
 .. note::
 
     To run examples in this document, install the package with ``doc`` optional dependency::

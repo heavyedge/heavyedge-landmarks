@@ -9,6 +9,9 @@
 
 ![title](https://heavyedge-landmarks.readthedocs.io/en/latest/_images/plot-header.png)
 
+> **Warning**: This project is no longer maintained as a standalone package.
+> Use [heavyedge-features](https://pypi.org/project/heavyedge-features/) package instead.
+
 Python package to locate landmarks from edge profiles.
 
 Supports:
